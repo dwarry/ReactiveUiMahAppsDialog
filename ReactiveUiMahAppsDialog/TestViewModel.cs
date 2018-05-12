@@ -38,14 +38,6 @@ namespace ReactiveUiMahAppsDialog
         }
 
 
-        public Interaction<String, FooBarBaz> Interaction { get; } = new Interaction<string, FooBarBaz>();
-    }
-
-
-    public class FooBarBaz
-    {
-        public string Foo { get; set; }
-
-        public string BarBaz { get; set; }
+        public Interaction<String, DialogData> Interaction { get; } = new Interaction<string, DialogData>();
     }
 }

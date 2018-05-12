@@ -1,4 +1,5 @@
-﻿using System.Reactive.Disposables;
+﻿using System;
+using System.Reactive.Disposables;
 using System.Windows.Controls;
 
 using MahApps.Metro.Controls.Dialogs;
@@ -18,9 +19,9 @@ namespace ReactiveUiMahAppsDialog
 
             this.WhenActivated(d =>
             {
-                DialogParticipation.SetRegister(this, this);
                 this.BindCommand(ViewModel, vm => vm.ShowDialog, view => view.ShowDialog).DisposeWith(d);
 
+                new DialogParticipationRegistration(this).DisposeWith(d);
 
                 this.ViewModel.Interaction.RegisterHandler(async interaction =>
                 {
@@ -32,7 +33,7 @@ namespace ReactiveUiMahAppsDialog
 
                             if (wasAccepted)
                             {
-                                interaction.SetOutput(new FooBarBaz{Foo = vm.Foo, BarBaz = vm.BarBaz});
+                                interaction.SetOutput(new DialogData{Foo = vm.Foo, BarBaz = vm.BarBaz});
                             }
                             else
                             {
@@ -48,14 +49,6 @@ namespace ReactiveUiMahAppsDialog
                 }).DisposeWith(d);
 
             });
-
-            this.Loaded += (sender, args) =>
-            {
-
-//                ViewModel.DialogCoordinator = DialogCoordinator.Instance;
-            };
-
-            this.Unloaded += (sender, args) => { DialogParticipation.SetRegister(this, null); };
         }
 
         object IViewFor.ViewModel
@@ -66,5 +59,24 @@ namespace ReactiveUiMahAppsDialog
 
 
         public TestViewModel ViewModel { get; set; }
+
+
+        private class DialogParticipationRegistration : IDisposable
+        {
+            private readonly TestView _view;
+
+            public DialogParticipationRegistration(TestView view)
+            {
+                _view = view;
+                DialogParticipation.SetRegister(view, view);
+            }
+
+            public void Dispose()
+            {
+                DialogParticipation.SetRegister(_view, null);
+            }
+        }
     }
+
+
 }
